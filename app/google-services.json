@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "714468770231",
+    "firebase_url": "https://inhabitpototypr0.firebaseio.com",
+    "project_id": "inhabitpototypr0",
+    "storage_bucket": "inhabitpototypr0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714468770231:android:993a63cf766468e384a832",
+        "android_client_info": {
+          "package_name": "com.example.inhabitpototypr_0"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714468770231-5iuqcg085ii9bvgqt1hs1i6qdmjdvu0h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.inhabitpototypr_0",
+            "certificate_hash": "8ecdc29fa5138e35ee85c29935262eee772faa7a"
+          }
+        },
+        {
+          "client_id": "714468770231-o7o9g8qjdi6098khe06tfqli80h9mnuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgpuyBO25jnrZGr5fkYL0bXb6G2SFy0Jg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714468770231-o7o9g8qjdi6098khe06tfqli80h9mnuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
