@@ -31,7 +31,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkUser();
         init();
+    }
+
+
+    public void checkUser() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+            Intent intent = new Intent(this, HomePageActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void init() {
@@ -65,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
                 Toast.makeText(this, "Welcome " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                checkUser();
             }
         }
     }
