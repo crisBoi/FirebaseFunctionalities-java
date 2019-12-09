@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/image_to_upload_iv"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        />
+
+    <Button
+        android:id="@+id/upload_btn"
+        android:text="upload"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        />
+
+    <EditText
+        android:id="@+id/caption_edt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/image_to_upload_iv"
+        android:hint="Enter about the photo"
+        android:layout_marginTop="50dp"
+        />
+
+
+</RelativeLayout>
