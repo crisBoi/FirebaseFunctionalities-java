@@ -2,6 +2,7 @@ package com.example.inhabitpototypr_0;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -11,14 +12,26 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.BitSet;
+import java.util.Random;
 
 public class UploadActivity extends AppCompatActivity {
 
@@ -28,6 +41,8 @@ public class UploadActivity extends AppCompatActivity {
 
 
     private DatabaseReference mDatabaseReference;
+    private FirebaseStorage mStorage;
+    private StorageReference storageReference;
 
     private static final int OPEN_GALLERY = 123;
 
@@ -36,12 +51,17 @@ public class UploadActivity extends AppCompatActivity {
     private Post post;
     private Bitmap selectedImageBitmap;
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_post);
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance();
+        storageReference = mStorage.getReference();
+        post = new Post();
 
         init();
     }
@@ -54,12 +74,8 @@ public class UploadActivity extends AppCompatActivity {
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String caption = captionEdt.getText().toString();
-                if (!caption.isEmpty()) {
-                    savePost(caption);
-                } else {
-                    Toast.makeText(UploadActivity.this, "please enter some text", Toast.LENGTH_SHORT).show();
-                }
+
+                uploadImage("filename" + new Random().nextInt(), imageToUploadIv);
             }
         });
 
@@ -75,11 +91,10 @@ public class UploadActivity extends AppCompatActivity {
 
 
     private void savePost(String caption) {
-        Post post2 = new Post();
-        post2.setCaption(caption);
+        post.setCaption(caption);
 
         String key = mDatabaseReference.child("post").push().getKey();
-        mDatabaseReference.child(key).child("posts").setValue(post2);
+        mDatabaseReference.child(key).child("posts").setValue(post);
     }
 
     private void openGallery() {
@@ -112,5 +127,72 @@ public class UploadActivity extends AppCompatActivity {
     private void setImage() throws IOException {
         selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImgUri);
         imageToUploadIv.setImageBitmap(selectedImageBitmap);
+    }
+
+
+    private void uploadImage(String fileName, ImageView imageView) {
+        final StorageReference ref = storageReference.child("images").child(fileName);
+
+        byte[] images = imageToByte(imageView);
+
+        UploadTask uploadTask = ref.putBytes(images);
+
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(UploadActivity.this, "upload failed", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(UploadActivity.this, "upload successful", Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                return ref.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isComplete()) {
+                    Uri downloadUri = task.getResult();
+                    String imgUrl = downloadUri.toString();
+
+                    post.setImgUrl(downloadUri.toString());
+
+                    String caption = captionEdt.getText().toString();
+                    if (!caption.isEmpty()) {
+                        savePost(caption);
+                    } else {
+                        Toast.makeText(UploadActivity.this, "please enter some text", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+
+    }
+
+    private byte[] imageToByte(ImageView imageView) {
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        byte[] data = baos.toByteArray();
+
+        return data;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.inhabitpototypr_0;
 
+import android.net.Uri;
+
 public class Post {
     private String imgUrl;
     private String caption;
